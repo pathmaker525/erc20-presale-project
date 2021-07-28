@@ -267,7 +267,7 @@ interface IERC20 {
 
 
 
-contract DMG_PreSale is ReentrancyGuard, Context, Ownable {
+contract REALESTATE_PreSale is ReentrancyGuard, Context, Ownable {
 
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
