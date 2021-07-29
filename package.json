@@ -22,6 +22,10 @@
   },
   "homepage": "https://github.com/CoryITpro/Real-Estate-Presale#readme",
   "dependencies": {
-    "@openzeppelin/contracts": "^4.2.0"
+    "@openzeppelin/contracts": "^4.2.0",
+    "@truffle/hdwallet-provider": "^1.4.2",
+    "dotenv": "^10.0.0",
+    "prettier": "^2.3.2",
+    "web3": "^1.5.0"
   }
 }

@@ -1,4 +1,7 @@
 # ignore file list
 node_modules
+build
+build\contracts
 
+.env
 package-lock.json

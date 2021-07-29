@@ -259,7 +259,7 @@ interface IUniswapV2Router02 is IUniswapV2Router01 {
 }
 
 
-contract REALESTATE_PreSale is ReentrancyGuard, Context, Ownable {
+contract RE_PreSale is ReentrancyGuard, Context, Ownable {
 
     using SafeMath for uint256;
     using SafeERC20 for IERC20;

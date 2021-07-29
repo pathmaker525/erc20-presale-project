@@ -178,7 +178,7 @@ library SafeMath {
     }
 }
 
-contract ProfitDistribution is Ownable {
+contract Profit_Distribution is Ownable {
 
   using SafeMath for uint256;
   using Address for address;
