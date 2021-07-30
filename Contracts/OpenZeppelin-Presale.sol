@@ -33,25 +33,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-
-abstract contract ReentrancyGuard {
-
-    bool private _notEntered;
-
-    constructor () {
-
-        _notEntered = true;
-    }
-
-    modifier nonReentrant() {
-
-        require(_notEntered, "ReentrancyGuard: reentrant call");
-
-        _notEntered = false;
-        _;
-        _notEntered = true;
-    }
-}
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 
 interface IUniswapV2Factory {
