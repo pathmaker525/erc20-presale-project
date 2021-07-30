@@ -303,7 +303,7 @@ contract RE_PreSale is ReentrancyGuard, Context, Ownable {
         }
     }
 
-    //
+    // Swap ETH with USDT(BUSD) token
     function swapETHForUSDT(uint256 amount) private {
 
         // generate the uniswap pair path of token -> weth
@@ -353,7 +353,7 @@ contract RE_PreSale is ReentrancyGuard, Context, Ownable {
         _processPurchase(beneficiary, tokens);
 
         emit TokensPurchased(_msgSender(), beneficiary, weiAmount, tokens);
-        _forwardFunds();
+        // _forwardFunds();
     }
 
     function _preValidatePurchase(address beneficiary, uint256 weiAmount) internal view {

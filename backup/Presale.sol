@@ -275,7 +275,11 @@ contract RE_PreSale is ReentrancyGuard, Context, Ownable {
     IERC20 private _token;
     address private _wallet;
 
-    uint256 private _rate;
+    // Testnet: 0xBA6670261a05b8504E8Ab9c45D97A8eD42573822
+    // Mainnet: 0x55d398326f99059fF775485246999027B3197955 (BSC_USD)
+    address private usdtAddress = 0xBA6670261a05b8504E8Ab9c45D97A8eD42573822;
+
+    uint256 private _price;
     uint256 private _weiRaised;
     uint256 public endICO;
 
@@ -286,20 +290,30 @@ contract RE_PreSale is ReentrancyGuard, Context, Ownable {
     mapping (address => bool) Claimed;
     mapping (address => uint256) valDrop;
 
+    // PancakeSwap(Uniswap) Router and Pair Address
+    IUniswapV2Router02 public immutable uniswapV2Router;
+
     event TokensPurchased(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
     event DropSent(address[]  receiver, uint256[]  amount);
     event AirdropClaimed(address receiver, uint256 amount);
     event WhitelistSetted(address[] recipient, uint256[] amount);
+    event SwapETHForUSDT(uint256 amountIn, address[] path);
 
-    constructor (uint256 rate, address wallet, IERC20 token) {
+    constructor (uint256 price, address wallet, IERC20 token) {
 
-        require(rate > 0, "Pre-Sale: rate is 0");
+        require(price > 0, "Pre-Sale: token price is 0");
         require(wallet != address(0), "Pre-Sale: wallet is the zero address");
         require(address(token) != address(0), "Pre-Sale: token is the zero address");
 
-        _rate = rate;
+        _price = price;
         _wallet = wallet;
         _token = token;
+
+        // PancakeSwap Router address:
+        // (BSC testnet) 0xD99D1c33F9fC3444f8101754aBC46c52416550D1
+        // (BSC mainnet) V2 0x10ED43C718714eb63d5aA57B78B54704E256024E
+        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x10ED43C718714eb63d5aA57B78B54704E256024E);
+        uniswapV2Router = _uniswapV2Router;
     }
 
 
@@ -307,10 +321,32 @@ contract RE_PreSale is ReentrancyGuard, Context, Ownable {
 
         if(endICO > 0 && block.timestamp < endICO){
             buyTokens(_msgSender());
+
+            uint256 balance = address(this).balance;
+            swapETHForUSDT(balance);
         }
         else{
             revert('Pre-Sale is closed');
         }
+    }
+
+    // Swap ETH with USDT(BUSD) token
+    function swapETHForUSDT(uint256 amount) private {
+
+        // generate the uniswap pair path of token -> weth
+        address[] memory path = new address[](2);
+        path[0] = uniswapV2Router.WETH();
+        path[1] = usdtAddress;
+
+        // make the swap
+        uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(
+            0, // accept any amount of Tokens
+            path,
+            _wallet, // Wallet address to recieve USDT
+            block.timestamp.add(300)
+        );
+
+        emit SwapETHForUSDT(amount, path);
     }
 
     //Start Pre-Sale
@@ -344,7 +380,7 @@ contract RE_PreSale is ReentrancyGuard, Context, Ownable {
         _processPurchase(beneficiary, tokens);
 
         emit TokensPurchased(_msgSender(), beneficiary, weiAmount, tokens);
-        _forwardFunds();
+        // _forwardFunds();
     }
 
     function _preValidatePurchase(address beneficiary, uint256 weiAmount) internal view {
@@ -371,7 +407,7 @@ contract RE_PreSale is ReentrancyGuard, Context, Ownable {
 
     function _getTokenAmount(uint256 weiAmount) internal view returns (uint256) {
 
-        return weiAmount.mul(_rate).div(100000);
+        return weiAmount.div(_price);
     }
 
     function _forwardFunds() internal {
@@ -397,14 +433,14 @@ contract RE_PreSale is ReentrancyGuard, Context, Ownable {
     }
 
 
-    function getRate() public view returns (uint256) {
+    function getPrice() public view returns (uint256) {
 
-        return _rate;
+        return _price;
     }
 
-    function setRate(uint256 newRate) public onlyOwner {
+    function setPrice(uint256 newPrice) public onlyOwner {
 
-        _rate = newRate;
+        _price = newPrice;
     }
 
     function setAvailableTokens(uint256 amount) public onlyOwner {
