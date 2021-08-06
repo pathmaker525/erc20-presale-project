@@ -14,7 +14,7 @@ const {
 require("dotenv").config({ path: "./.env" })
 
 contract("Real Estate Project Test", async (accounts) => {
-  const [investor, receiver, hacker_1, hacker_2] = accounts
+  const [investor, receiver, receiver_2, hacker_1, hacker_2] = accounts
 
   console.log("Investor: ", investor)
   console.log("Receiver: ", receiver)
@@ -28,6 +28,7 @@ contract("Real Estate Project Test", async (accounts) => {
   const hardCap = ether(4000)
   const transfer = new BN(150000000000000)
   const newRate = 10
+  const poolPercentage = 5
 
   beforeEach(async () => {
     this.token = await Token.new()
@@ -59,7 +60,23 @@ contract("Real Estate Project Test", async (accounts) => {
         this.token.balanceOf(investor)
       ).to.eventually.be.a.bignumber.equal(await this.token.totalSupply())
     })
+    it("transfer to or from blacklisted address will be rejected", async () => {
+      await expect(this.token.setAddressAsBlacklisted(hacker_1)).to.eventually
+        .be.fulfilled
+      await expect(this.token.transfer(hacker_1, transfer)).to.eventually.be
+        .rejected
+    })
+    it("transfer to or from whitelisted address will be fulfilled", async () => {
+      await expect(this.token.setAddressAsWhitelisted(receiver)).to.eventually
+        .be.fulfilled
+      await expect(this.token.transfer(receiver, transfer)).to.eventually.be
+        .fulfilled
+      await expect(this.token.transfer(receiver_2, transfer)).to.eventually.be
+        .rejected
+    })
     it("should be able to transfer between accounts", async () => {
+      await expect(this.token.setAddressAsWhitelisted(receiver)).to.eventually
+        .be.fulfilled
       await expect(this.token.transfer(receiver, transfer)).to.eventually.be
         .fulfilled
       await expect(
@@ -74,12 +91,6 @@ contract("Real Estate Project Test", async (accounts) => {
         )
       ).to.eventually.be.rejected
     })
-    it("transfer to or from blacklisted address will be rejected", async () => {
-      await expect(this.token.setAddressAsBlacklisted(hacker_1)).to.eventually
-        .be.fulfilled
-      await expect(this.token.transfer(hacker_1, transfer)).to.eventually.be
-        .rejected
-    })
   })
 
   describe("Pre-Sale", async () => {
@@ -92,7 +103,8 @@ contract("Real Estate Project Test", async (accounts) => {
           hugeInvestment,
           tTotal,
           softCap,
-          hardCap
+          hardCap,
+          poolPercentage
         )
       ).to.eventually.be.fulfilled
     })
@@ -121,7 +133,8 @@ contract("Real Estate Project Test", async (accounts) => {
           hugeInvestment,
           tTotal,
           softCap,
-          hardCap
+          hardCap,
+          poolPercentage
         )
       ).to.eventually.be.fulfilled
 

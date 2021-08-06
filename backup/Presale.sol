@@ -485,6 +485,8 @@ contract RE_PreSale is ReentrancyGuard, Context, Ownable {
     uint256 public softCap;
     uint256 public hardCap;
 
+    uint256 public poolPercent;
+
     uint256 private _price;
     uint256 private _weiRaised;
     uint256 public endICO;
@@ -577,14 +579,16 @@ contract RE_PreSale is ReentrancyGuard, Context, Ownable {
     }
 
     //Start Pre-Sale
-    function startICO(uint endDate, uint _minPurchase, uint _maxPurchase, uint _availableTokens, uint256 _softCap, uint256 _hardCap) external onlyOwner icoNotActive() {
+    function startICO(uint endDate, uint _minPurchase, uint _maxPurchase, uint _availableTokens, uint256 _softCap, uint256 _hardCap, uint256 _poolPercent) external onlyOwner icoNotActive() {
 
         require(endDate > block.timestamp, 'Pre-Sale: duration should be > 0');
         require(_availableTokens > 0 && _availableTokens <= _token.totalSupply(), 'Pre-Sale: availableTokens should be > 0 and <= totalSupply');
+        require(_poolPercent >= 0 && _poolPercent < _token.totalSupply(), 'Pre-Sale: poolPercent should be >= 0 and < totalSupply');
         require(_minPurchase > 0, 'Pre-Sale: _minPurchase should > 0');
 
         endICO = endDate;
-        availableTokensICO = _availableTokens;
+        poolPercent = _poolPercent;
+        availableTokensICO = _availableTokens.div(_availableTokens.mul(_poolPercent).div(10**2));
 
         minPurchase = _minPurchase;
         maxPurchase = _maxPurchase;
