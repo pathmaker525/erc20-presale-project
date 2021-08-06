@@ -6,8 +6,8 @@ const BN = web3.utils.BN
 
 const {
   ether,
-  getBalance,
   transferOwnership,
+  expectInvalidOpcode,
   makeTransaction,
 } = require("./helpers.js")
 
@@ -18,6 +18,8 @@ contract("Real Estate Project Test", async (accounts) => {
 
   console.log("Investor: ", investor)
   console.log("Receiver: ", receiver)
+  console.log("Token Address:", Token.address)
+  console.log("Presale Address:", PreSale.address)
 
   const investment = ether(10)
   const smallInvestment = ether(0.5)
@@ -25,6 +27,7 @@ contract("Real Estate Project Test", async (accounts) => {
   const softCap = ether(2500)
   const hardCap = ether(4000)
   const transfer = new BN(150000000000000)
+  const newRate = 10
 
   beforeEach(async () => {
     this.token = await Token.new()
@@ -41,13 +44,13 @@ contract("Real Estate Project Test", async (accounts) => {
       const newOwner = await this.presale.owner.call()
       assert.equal(receiver, newOwner)
     })
-    // it("should not be transferable by non-owner", async () => {
-    //   await expectInvalidOpcode(
-    //     transferOwnership(this.presale, hacker_1, hacker_2)
-    //   )
-    //   const newOwner = await this.presale.owner.call()
-    //   return assert.equal(this.owner, newOwner)
-    // })
+    it("should not be transferable by non-owner", async () => {
+      await expectInvalidOpcode(
+        transferOwnership(this.presale, hacker_1, hacker_2)
+      )
+      const newOwner = await this.presale.owner.call()
+      return assert.equal(this.owner, newOwner)
+    })
   })
 
   describe("Tokens", async () => {
@@ -59,6 +62,9 @@ contract("Real Estate Project Test", async (accounts) => {
     it("should be able to transfer between accounts", async () => {
       await expect(this.token.transfer(receiver, transfer)).to.eventually.be
         .fulfilled
+      await expect(
+        this.token.balanceOf(receiver)
+      ).to.eventually.be.a.bignumber.equal(transfer)
     })
     it("transfer exceed total amount should be rejected", async () => {
       await expect(
@@ -76,30 +82,51 @@ contract("Real Estate Project Test", async (accounts) => {
     })
   })
 
-  // describe("Pre-Sale", async () => {
-  //   it("ICO starts", async () => {
-  //     await expect(
-  //       this.presale.startICO(
-  //         1630376078,
-  //         smallInvestment,
-  //         hugeInvestment,
-  //         await this.token.totalSupply(),
-  //         softCap,
-  //         hardCap
-  //       )
-  //     ).to.eventually.be.fulfilled
+  describe("Pre-Sale", async () => {
+    it("ICO starts", async () => {
+      const tTotal = await this.token.totalSupply()
+      await expect(
+        this.presale.startICO(
+          1630376078,
+          smallInvestment,
+          hugeInvestment,
+          tTotal,
+          softCap,
+          hardCap
+        )
+      ).to.eventually.be.fulfilled
+    })
+    // This features needs to be tested on Kovan Testnet because this one include SWAP feature.
+    // it("should allow admin to stop ICO", async () => {
+    //   const tTotal = await this.token.totalSupply()
+    //   await expect(
+    //     this.presale.startICO(
+    //       1630376078,
+    //       smallInvestment,
+    //       hugeInvestment,
+    //       tTotal,
+    //       softCap,
+    //       hardCap
+    //     )
+    //   ).to.eventually.be.fulfilled
 
-  //     txn_obj = {
-  //       from: investor,
-  //       to: this.presale.address,
-  //       value: investment,
-  //       gas: 1000000,
-  //     }
-  //     txn = await expect(makeTransaction(txn_obj)).to.eventually.be.fulfilled
+    //   await expect(this.presale.stopICO()).to.eventually.be.fulfilled
+    // })
+    it("should allow admin to reset Rate", async () => {
+      const tTotal = await this.token.totalSupply()
+      await expect(
+        this.presale.startICO(
+          1630376078,
+          smallInvestment,
+          hugeInvestment,
+          tTotal,
+          softCap,
+          hardCap
+        )
+      ).to.eventually.be.fulfilled
 
-  //     params = { from: investor, gas: 1000000, value: investment }
-  //     txn_2 = await expect(this.presale.buyTokens(investor, params)).to
-  //       .eventually.be.fulfilled
-  //   })
-  // })
+      await expect(this.presale.setRate(newRate)).to.eventually.be.fulfilled
+      await expect(this.presale.getRate()).to.be.eventually.be.equal(newRate)
+    })
+  })
 })

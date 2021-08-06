@@ -43,7 +43,7 @@ const expectInvalidOpcode = async (promise) => {
   try {
     await promise
   } catch (error) {
-    expect(error.message).to.include("invalid opcode")
+    expect(error.message).to.include("caller is not the owner")
     return
   }
   expect.fail("Expected throw not received")
@@ -74,8 +74,7 @@ const ether = (amount) => {
 }
 
 const makeTransaction = async (tx_obj) => {
-  let tx_hash = await web3.eth.sendTransaction(tx_obj)
-  return tx_hash
+  return web3.eth.sendTransaction(tx_obj)
 }
 
 const makeTransactions = async (txns) => {
