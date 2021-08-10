@@ -1,5 +1,5 @@
 const RE_Token = artifacts.require("RE_Token")
-const RE_Presale = artifacts.require("RE_Presale")
+const RE_Presale = artifacts.require("RE_PreSale")
 
 module.exports = async (deployer) => {
   let addr = await web3.eth.getAccounts()

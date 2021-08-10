@@ -15,10 +15,12 @@ module.exports = {
       provider: () =>
         new HDWalletProvider(
           process.env.MNEMONIC,
-          "https://data-seed-prebsc-1-s1.binance.org:8545"
+          "wss://data-seed-prebsc-1-s1.binance.org:8545"
         ),
-      gas: 550000,
+      gas: 5500000,
       network_id: 97,
+      confirmations: 10,
+      timeoutBlocks: 200,
       skipDryRun: true,
     },
   },

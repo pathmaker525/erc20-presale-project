@@ -38,14 +38,17 @@ contract("Real Estate Project Test", async (accounts) => {
 
   describe("Ownership", async () => {
     it("should initially belong to contract caller", async () => {
+      console.log(this.token.address, this.presale.address)
       assert.equal(this.owner, investor)
     })
     it("should be transferable to another account", async () => {
+      console.log(this.token.address, this.presale.address)
       await transferOwnership(this.presale, this.owner, receiver)
       const newOwner = await this.presale.owner.call()
       assert.equal(receiver, newOwner)
     })
     it("should not be transferable by non-owner", async () => {
+      console.log(this.token.address, this.presale.address)
       await expectInvalidOpcode(
         transferOwnership(this.presale, hacker_1, hacker_2)
       )
@@ -56,17 +59,20 @@ contract("Real Estate Project Test", async (accounts) => {
 
   describe("Tokens", async () => {
     it("all should initially be in owners account", async () => {
+      console.log(this.token.address, this.presale.address)
       await expect(
         this.token.balanceOf(investor)
       ).to.eventually.be.a.bignumber.equal(await this.token.totalSupply())
     })
     it("transfer to or from blacklisted address will be rejected", async () => {
+      console.log(this.token.address, this.presale.address)
       await expect(this.token.setAddressAsBlacklisted(hacker_1)).to.eventually
         .be.fulfilled
       await expect(this.token.transfer(hacker_1, transfer)).to.eventually.be
         .rejected
     })
     it("transfer to or from whitelisted address will be fulfilled", async () => {
+      console.log(this.token.address, this.presale.address)
       await expect(this.token.setAddressAsWhitelisted(receiver)).to.eventually
         .be.fulfilled
       await expect(this.token.transfer(receiver, transfer)).to.eventually.be
@@ -75,6 +81,7 @@ contract("Real Estate Project Test", async (accounts) => {
         .rejected
     })
     it("should be able to transfer between accounts", async () => {
+      console.log(this.token.address, this.presale.address)
       await expect(this.token.setAddressAsWhitelisted(receiver)).to.eventually
         .be.fulfilled
       await expect(this.token.transfer(receiver, transfer)).to.eventually.be
@@ -84,6 +91,7 @@ contract("Real Estate Project Test", async (accounts) => {
       ).to.eventually.be.a.bignumber.equal(transfer)
     })
     it("transfer exceed total amount should be rejected", async () => {
+      console.log(this.token.address, this.presale.address)
       await expect(
         this.token.transfer(
           receiver,
@@ -95,6 +103,7 @@ contract("Real Estate Project Test", async (accounts) => {
 
   describe("Pre-Sale", async () => {
     it("ICO starts", async () => {
+      console.log(this.token.address, this.presale.address)
       const tTotal = await this.token.totalSupply()
       await expect(
         this.presale.startICO(
@@ -125,6 +134,7 @@ contract("Real Estate Project Test", async (accounts) => {
     //   await expect(this.presale.stopICO()).to.eventually.be.fulfilled
     // })
     it("should allow admin to reset Rate", async () => {
+      console.log(this.token.address, this.presale.address)
       const tTotal = await this.token.totalSupply()
       await expect(
         this.presale.startICO(
