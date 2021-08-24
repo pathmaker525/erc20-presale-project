@@ -17,7 +17,7 @@ module.exports = {
           process.env.MNEMONIC,
           "wss://data-seed-prebsc-1-s1.binance.org:8545"
         ),
-      gas: 5500000,
+      gas: 9900000,
       network_id: 97,
       confirmations: 10,
       timeoutBlocks: 200,

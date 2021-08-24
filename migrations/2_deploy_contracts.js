@@ -10,7 +10,7 @@ module.exports = async (deployer) => {
   // Deploy Real Estate Demo PreSale with rate 1, owner address, IERC20 token
   await deployer.deploy(
     RE_Presale,
-    1 /* _rate */,
+    5 /* _rate */,
     addr[0] /* _wallet */,
     RE_Token.address /* IERC20 Token Contract */
   )

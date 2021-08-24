@@ -31,10 +31,10 @@ const waitUntilTransactionsMined = (txn_hashes) => {
   }
 }
 
-const transferOwnership = async (crowdsale, sender, receiver) => {
-  tx = await crowdsale.transferOwnership(receiver, {
+const transferOwnership = async (instance, sender, receiver) => {
+  tx = await instance.transferOwnership(receiver, {
     from: sender,
-    gas: 100000,
+    gas: 1000000,
   })
   await waitUntilTransactionsMined(tx.tx)
 }

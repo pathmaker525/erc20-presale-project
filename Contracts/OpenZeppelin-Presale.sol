@@ -261,6 +261,7 @@ contract RE_PreSale is ReentrancyGuard, Context, Ownable {
     uint256 private _price;
     uint256 private _weiRaised;
     uint256 public endICO;
+    uint256 public startICOTimestamp = 0;
 
     uint public minPurchase;
     uint public maxPurchase;
@@ -297,7 +298,7 @@ contract RE_PreSale is ReentrancyGuard, Context, Ownable {
         // PancakeSwap Router address:
         // (BSC testnet) 0xD99D1c33F9fC3444f8101754aBC46c52416550D1
         // (BSC mainnet) V2 0x10ED43C718714eb63d5aA57B78B54704E256024E
-        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x10ED43C718714eb63d5aA57B78B54704E256024E);
+        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0xD99D1c33F9fC3444f8101754aBC46c52416550D1);
         uniswapV2Router = _uniswapV2Router;
     }
 
@@ -357,6 +358,7 @@ contract RE_PreSale is ReentrancyGuard, Context, Ownable {
         require(_poolPercent >= 0 && _poolPercent < _token.totalSupply(), 'Pre-Sale: poolPercent should be >= 0 and < totalSupply');
         require(_minPurchase > 0, 'Pre-Sale: _minPurchase should > 0');
 
+        startICOTimestamp = block.timestamp;
         endICO = endDate;
         poolPercent = _poolPercent;
         availableTokensICO = _availableTokens.div(_availableTokens.mul(_poolPercent).div(10**2));
@@ -382,6 +384,21 @@ contract RE_PreSale is ReentrancyGuard, Context, Ownable {
         }
     }
 
+    function getCurrentTimestamp() public view returns (uint256) {
+        return block.timestamp;
+    }
+    
+    function getEndICOTimestamp() public view returns (uint256) {
+        require(endICO > 0, "Error: Presale has finished already");
+        
+        return endICO;
+    }
+    
+    function getStartIcoTimestamp() public view returns (uint256) {
+        require(startICOTimestamp > 0, "Error: Presale has not started yet");
+        
+        return startICOTimestamp;
+    }
 
     //Pre-Sale
     function buyTokens(address beneficiary) public nonReentrant icoActive payable {
