@@ -35,6 +35,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 interface IUniswapV2Factory {
 
@@ -241,6 +242,7 @@ interface IUniswapV2Router02 is IUniswapV2Router01 {
 }
 
 contract RE_PreSale is ReentrancyGuard, Context, Ownable {
+    AggregatorV3Interface internal priceFeed;
 
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
@@ -290,7 +292,7 @@ contract RE_PreSale is ReentrancyGuard, Context, Ownable {
         require(rate > 0, "Pre-Sale: rate is 0");
         require(wallet != address(0), "Pre-Sale: wallet is the zero address");
         require(address(token) != address(0), "Pre-Sale: token is the zero address");
-
+    
         _rate = rate;
         _wallet = wallet;
         _token = token;
@@ -300,6 +302,8 @@ contract RE_PreSale is ReentrancyGuard, Context, Ownable {
         // (BSC mainnet) V2 0x10ED43C718714eb63d5aA57B78B54704E256024E
         IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0xD99D1c33F9fC3444f8101754aBC46c52416550D1);
         uniswapV2Router = _uniswapV2Router;
+        priceFeed = AggregatorV3Interface(0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526);
+
     }
 
 
@@ -314,6 +318,21 @@ contract RE_PreSale is ReentrancyGuard, Context, Ownable {
         }
     }
 
+    /**
+    * Returns the latest price
+    */
+    function getLatestPrice() public view returns (int) {
+        (
+            uint80 roundID, 
+            int price,
+            uint startedAt,
+            uint timeStamp,
+            uint80 answeredInRound
+        ) = priceFeed.latestRoundData();
+        return price;
+    }
+    
+    
     // Swap ETH with USDT(BUSD) token
     function swapETHForUSDT(uint256 amount) private {
 
