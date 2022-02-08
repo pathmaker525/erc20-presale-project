@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "truffle-config.js",
-  "wallet": "0xb1F0F285EA991361e38f4e9e2078BC50237eda76",
+  "wallet": "0xb1F0F285EA991361e38f4e9e2078BC50237eda76, 0x75d08D5B49B53B6A8f964851E00707C3259Da330",
   "directories": {
     "test": "test"
   },
